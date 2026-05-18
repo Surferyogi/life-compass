@@ -30,16 +30,12 @@ export default function HomeScreen({ navigation, route }) {
     else { navigation.navigate('Interview', { sessionId: session.id }) }
   }
 
-  const deleteSession = (sessionId) => {
-    Alert.alert('Delete Session', 'Are you sure? This cannot be undone.', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: async () => {
-        try {
-          await supabase.from('lc_sessions').delete().eq('id', sessionId)
-          setSessions(prev => prev.filter(s => s.id !== sessionId))
-        } catch (e) { Alert.alert('Error', e.message) }
-      }}
-    ])
+  const deleteSession = async (sessionId) => {
+    if (!window.confirm('Delete this session? This cannot be undone.')) return
+    try {
+      await supabase.from('lc_sessions').delete().eq('id', sessionId)
+      setSessions(prev => prev.filter(s => s.id !== sessionId))
+    } catch (e) { console.error(e) }
   }
 
   const devTest = async () => {
@@ -84,10 +80,8 @@ export default function HomeScreen({ navigation, route }) {
   }
 
   const signOut = () => {
-    Alert.alert('Sign Out', 'Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign Out', style: 'destructive', onPress: () => supabase.auth.signOut() },
-    ])
+    if (!window.confirm('Sign out?')) return
+    supabase.auth.signOut()
   }
 
   const formatDate = (iso) => {

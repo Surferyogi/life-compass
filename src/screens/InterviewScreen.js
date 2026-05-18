@@ -81,14 +81,11 @@ export default function InterviewScreen({ navigation, route }) {
       navigation.replace('Report', { sessionId, reportData: report })
     } catch (e) {
       setSynthesising(false)
-      Alert.alert(
-        'Synthesis Error',
-        e.message + '\n\nYour answers are saved. You can retry.',
-        [
-          { text: 'Retry', onPress: handleSynthesis },
-          { text: 'Exit', onPress: () => navigation.navigate('Home') },
-        ]
-      )
+      if (window.confirm('Synthesis error: ' + e.message + '\n\nRetry?')) {
+        handleSynthesis()
+      } else {
+        navigation.navigate('Home')
+      }
     }
   }
 
