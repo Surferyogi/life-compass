@@ -25,8 +25,13 @@ jobs:
 
       - name: Fix asset paths for GitHub Pages
         run: |
-          sed -i "s|src="/_expo/|src="/life-compass/_expo/|g" dist/index.html
-          sed -i "s|href="/favicon|href="/life-compass/favicon|g" dist/index.html
+          python3 -c "
+          content = open('dist/index.html').read()
+          content = content.replace('src='/_expo/', 'src='/life-compass/_expo/')
+          content = content.replace('href='/favicon', 'href='/life-compass/favicon')
+          open('dist/index.html','w').write(content)
+          print('Patched')
+          "
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
