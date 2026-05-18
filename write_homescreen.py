@@ -1,4 +1,6 @@
-import { useState, useCallback } from 'react'
+import os
+
+content = """import { useState, useCallback } from 'react'
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, SafeAreaView, Alert } from 'react-native'
 import { useFocusEffect } from '@react-navigation/native'
 import { supabase, getUserSessions, createSession } from '../lib/supabase'
@@ -134,3 +136,8 @@ const styles = StyleSheet.create({
   emptyIcon: { fontSize: 36, color: 'rgba(232,228,220,0.15)', marginBottom: 16 },
   emptyText: { fontSize: 15, color: 'rgba(232,228,220,0.3)', textAlign: 'center', lineHeight: 22 },
 })
+"""
+
+with open('src/screens/HomeScreen.js', 'w') as f:
+    f.write(content)
+print('Done')

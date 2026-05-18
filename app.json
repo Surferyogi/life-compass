@@ -27,6 +27,7 @@
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "baseUrl": "/life-compass"
   }
 }
