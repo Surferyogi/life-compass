@@ -23,11 +23,11 @@
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "baseUrl": "/life-compass"
     },
     "plugins": [
       "expo-secure-store"
-    ],
-    "baseUrl": "/life-compass"
+    ]
   }
 }

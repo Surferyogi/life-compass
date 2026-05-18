@@ -42,6 +42,47 @@ export default function HomeScreen({ navigation, route }) {
     ])
   }
 
+  const devTest = async () => {
+    setLoading(true)
+    try {
+      const session = await createSession(userId)
+      const a = {
+        love_1:'I lose track of time when exploring cities with my camera or on the golf course.',
+        love_2:'I would spend a month snowboarding in Japan and photographing remote landscapes.',
+        love_3:'I read about energy transition, AI, and how technology can solve climate change.',
+        love_4:'Korea was the most alive - founding a subsidiary from scratch gave me full ownership.',
+        good_1:'I uniquely combine deep technical knowledge with cultural fluency across Asia and Europe.',
+        good_2:'I build trust across cultures and turn around struggling organisations.',
+        good_3:'During COVID I kept operations running with zero disruption while competitors struggled.',
+        good_4:'I speak Japanese and Korean which almost no Western executives do.',
+        world_1:'The energy transition needs leaders who understand both the science and the business.',
+        world_2:'There is a massive gap in APAC for CEO-level leaders who understand deep tech.',
+        world_3:'I want to be remembered as someone who helped accelerate clean energy transition in Asia.',
+        world_4:'I feel a strong pull toward Singapore and Japan as bases for impact.',
+        paid_1:'I am open to CEO roles, board positions, and potentially my own venture.',
+        paid_2:'I have enough saved. I want impact and legacy over maximising salary.',
+        paid_3:'My combination of PhD, operational scale, and Asian market knowledge is extremely rare.',
+        paid_4:'My network across Air Liquide, Korean industry, and Japanese corporates is unmatched.',
+        ody_1:'Plan A is CEO of a large industrial or energy company in APAC within 2 years.',
+        ody_2:'Plan B is launching a climate tech venture fund focused on APAC energy transition.',
+        ody_3:'Plan C is buying a small boutique hotel in a remote location and running it with Sophia.',
+        ody_4:'The common thread is impact at scale, cultural richness, and freedom to lead my own way.',
+        energy_1:'Last week in Tokyo I had dinner with researchers and felt completely energised by ideas.',
+        energy_2:'Corporate politics and slow decisions drain me. I would eliminate bureaucracy first.',
+        energy_3:'My top 3 are Deep Impact, Independence, and Adventure. Status matters less now.',
+        energy_4:'I want to be based in Singapore with freedom to travel 30 percent of the time.',
+        con_1:'Sophia and my health are non-negotiable. Any future must honour our partnership.',
+        con_2:'Sophia and I decide together. She wants stability but supports my ambition.',
+        con_3:'I am ready to move within 12 months when the right opportunity appears.',
+        con_4:'My secret fear is that I have been optimising for the wrong things and time is running out.',
+      }
+      const w = { wl_career:6, wl_health:8, wl_family:7, wl_finance:8, wl_social:7, wl_growth:5, wl_fun:6, wl_spirit:4 }
+      await supabase.from('lc_sessions').update({ answers: a, wheel_ratings: w, current_section: 7 }).eq('id', session.id)
+      navigation.navigate('Interview', { sessionId: session.id })
+    } catch(e) { Alert.alert('Error', e.message) }
+    setLoading(false)
+  }
+
   const signOut = () => {
     Alert.alert('Sign Out', 'Are you sure?', [
       { text: 'Cancel', style: 'cancel' },
@@ -89,6 +130,9 @@ export default function HomeScreen({ navigation, route }) {
           <Text style={styles.newBtnText}>{loading ? 'Creating...' : '+ Begin New Session'}</Text>
         </TouchableOpacity>
         <Text style={styles.newBtnHint}>8 sections  |  auto-saved after every section</Text>
+        <TouchableOpacity style={{marginTop:10, padding:10, alignItems:'center'}} onPress={devTest}>
+          <Text style={{fontSize:11, color:'rgba(232,228,220,0.25)'}}>DEV: Test Synthesis</Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.historyHeader}>
         <Text style={styles.historyLabel}>PAST SESSIONS</Text>
