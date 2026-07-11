@@ -1,3 +1,4 @@
+// Life Compass — v2026:07:11-09:42
 import 'react-native-url-polyfill/auto'
 import { useEffect, useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
@@ -8,6 +9,8 @@ import AuthScreen from './src/screens/AuthScreen'
 import HomeScreen from './src/screens/HomeScreen'
 import InterviewScreen from './src/screens/InterviewScreen'
 import ReportScreen from './src/screens/ReportScreen'
+import CoachScreen from './src/screens/CoachScreen'
+import CoachChatScreen from './src/screens/CoachChatScreen'
 
 const Stack = createNativeStackNavigator()
 
@@ -43,6 +46,8 @@ export default function App() {
             <Stack.Screen name="Home" component={HomeScreen} initialParams={{ userId: session.user.id }} />
             <Stack.Screen name="Interview" component={InterviewScreen} />
             <Stack.Screen name="Report" component={ReportScreen} />
+            <Stack.Screen name="Coach" component={CoachScreen} initialParams={{ userId: session.user.id }} />
+            <Stack.Screen name="CoachChat" component={CoachChatScreen} />
           </>
         ) : (
           <Stack.Screen name="Auth" component={AuthScreen} />

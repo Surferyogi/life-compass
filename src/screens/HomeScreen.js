@@ -124,6 +124,10 @@ export default function HomeScreen({ navigation, route }) {
           <Text style={styles.newBtnText}>{loading ? 'Creating...' : '+ Begin New Session'}</Text>
         </TouchableOpacity>
         <Text style={styles.newBtnHint}>8 sections  |  auto-saved after every section</Text>
+        <TouchableOpacity style={styles.coachBtn} onPress={() => navigation.navigate('Coach', { userId })}>
+          <Text style={styles.coachBtnText}>◆  TALK TO YOUR COACH</Text>
+        </TouchableOpacity>
+        <Text style={styles.versionText}>v2026:07:11-09:42</Text>
         <TouchableOpacity style={{marginTop:10, padding:10, alignItems:'center'}} onPress={devTest}>
           <Text style={{fontSize:11, color:'rgba(232,228,220,0.25)'}}>DEV: Test Synthesis</Text>
         </TouchableOpacity>
@@ -157,6 +161,9 @@ const styles = StyleSheet.create({
   newBtnDisabled: { opacity: 0.5 },
   newBtnText: { color: '#0b0e17', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   newBtnHint: { fontSize: 11, color: 'rgba(232,228,220,0.25)', textAlign: 'center', marginTop: 8 },
+  coachBtn: { marginTop: 12, borderWidth: 1, borderColor: 'rgba(124,185,232,0.4)', borderRadius: 4, padding: 16, alignItems: 'center' },
+  coachBtnText: { color: '#7CB9E8', fontSize: 13, letterSpacing: 2, fontWeight: '600' },
+  versionText: { fontSize: 9, color: 'rgba(232,228,220,0.18)', textAlign: 'center', marginTop: 10, letterSpacing: 1 },
   historyHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 24, marginBottom: 12 },
   historyLabel: { fontSize: 9, letterSpacing: 4, color: 'rgba(232,228,220,0.25)', marginRight: 12 },
   historyDivider: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.05)' },
