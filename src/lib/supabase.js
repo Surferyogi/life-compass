@@ -169,11 +169,25 @@ export async function getLatestReport(userId) {
   return data?.[0]?.report ?? null
 }
 
+// Supabase's client discards the Edge Function's response body on non-2xx
+// and throws a generic "Edge Function returned a non-2xx status code"
+// wrapper instead. This reads the real message our function actually sent
+// back, so failures are diagnosable instead of opaque.
+async function extractFunctionErrorMessage(error) {
+  try {
+    if (error?.context && typeof error.context.json === 'function') {
+      const body = await error.context.json()
+      if (body?.error) return body.error
+    }
+  } catch (_) { /* fall through to generic message below */ }
+  return error?.message || 'Unknown error calling lc-coach'
+}
+
 export async function coachChat({ messages, profile, report, context }) {
   const { data, error } = await supabase.functions.invoke('lc-coach', {
     body: { mode: 'chat', messages, profile, report, context },
   })
-  if (error) throw error
+  if (error) throw new Error(await extractFunctionErrorMessage(error))
   if (data.error) throw new Error(data.error)
   return data.reply
 }
@@ -233,7 +247,7 @@ export async function coachReflect({ messages, profile }) {
   const { data, error } = await supabase.functions.invoke('lc-coach', {
     body: { mode: 'reflect', messages, profile },
   })
-  if (error) throw error
+  if (error) throw new Error(await extractFunctionErrorMessage(error))
   if (data.error) throw new Error(data.error)
   return data.profile
 }
