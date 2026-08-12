@@ -169,20 +169,85 @@ export async function getLatestReport(userId) {
   return data?.[0]?.report ?? null
 }
 
-export async function coachChat({ messages, profile, report }) {
+// Supabase's client discards the Edge Function's response body on non-2xx
+// and throws a generic "Edge Function returned a non-2xx status code"
+// wrapper instead. This reads the real message our function actually sent
+// back, so failures are diagnosable instead of opaque.
+async function extractFunctionErrorMessage(error) {
+  try {
+    if (error?.context && typeof error.context.json === 'function') {
+      const body = await error.context.json()
+      if (body?.error) return body.error
+    }
+  } catch (_) { /* fall through to generic message below */ }
+  return error?.message || 'Unknown error calling lc-coach'
+}
+
+export async function coachChat({ messages, profile, report, context }) {
   const { data, error } = await supabase.functions.invoke('lc-coach', {
-    body: { mode: 'chat', messages, profile, report },
+    body: { mode: 'chat', messages, profile, report, context },
   })
-  if (error) throw error
+  if (error) throw new Error(await extractFunctionErrorMessage(error))
   if (data.error) throw new Error(data.error)
   return data.reply
+}
+
+// ─────────────────────────────────────────────
+// Session context: date/time + optional geolocation, captured
+// once when a coaching session opens. Never fabricated — if
+// geolocation is denied/unavailable, we say so explicitly and
+// let the coach know not to guess. No third-party geocoding
+// service is used; raw coordinates are sent to Claude directly,
+// which infers approximate location itself.
+// ─────────────────────────────────────────────
+
+function getLocalTimeContext() {
+  const now = new Date()
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || null
+  const localDateTime = now.toLocaleString('en-SG', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', timeZoneName: 'short',
+  })
+  return { localDateTime, timeZone }
+}
+
+function getGeolocationContext(timeoutMs = 6000) {
+  return new Promise((resolve) => {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      resolve({ status: 'unsupported' })
+      return
+    }
+    const timer = setTimeout(() => resolve({ status: 'timeout' }), timeoutMs)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        clearTimeout(timer)
+        resolve({
+          status: 'granted',
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          accuracyMeters: Math.round(pos.coords.accuracy),
+        })
+      },
+      (err) => {
+        clearTimeout(timer)
+        resolve({ status: err.code === 1 ? 'denied' : 'unavailable' })
+      },
+      { enableHighAccuracy: false, timeout: timeoutMs, maximumAge: 300000 }
+    )
+  })
+}
+
+export async function getSessionContext() {
+  const time = getLocalTimeContext()
+  const geo = await getGeolocationContext()
+  return { ...time, geo }
 }
 
 export async function coachReflect({ messages, profile }) {
   const { data, error } = await supabase.functions.invoke('lc-coach', {
     body: { mode: 'reflect', messages, profile },
   })
-  if (error) throw error
+  if (error) throw new Error(await extractFunctionErrorMessage(error))
   if (data.error) throw new Error(data.error)
   return data.profile
 }

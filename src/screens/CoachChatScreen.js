@@ -5,7 +5,8 @@ import {
 } from 'react-native'
 import {
   getMessages, saveMessage, coachChat, coachReflect,
-  getMindsetProfile, saveMindsetProfile, getLatestReport, updateConversationTitle
+  getMindsetProfile, saveMindsetProfile, getLatestReport, updateConversationTitle,
+  getSessionContext
 } from '../lib/supabase'
 
 const ACCENT = '#7CB9E8'
@@ -21,25 +22,28 @@ export default function CoachChatScreen({ navigation, route }) {
   const [distilling, setDistilling] = useState(false)
   const [profile, setProfile] = useState(null)
   const [report, setReport] = useState(null)
+  const [sessionContext, setSessionContext] = useState(null)
 
   useEffect(() => {
     let active = true
     const init = async () => {
       try {
-        const [msgs, prof, rep] = await Promise.all([
+        const [msgs, prof, rep, ctx] = await Promise.all([
           getMessages(conversationId),
           getMindsetProfile(userId),
           getLatestReport(userId),
+          getSessionContext(),
         ])
         if (!active) return
         const p = prof?.profile && Object.keys(prof.profile).length > 0 ? prof.profile : null
         setProfile(p)
         setReport(rep)
+        setSessionContext(ctx)
         setMessages(msgs)
         setLoading(false)
         if (msgs.length === 0) {
           setThinking(true)
-          const reply = await coachChat({ messages: [], profile: p, report: rep })
+          const reply = await coachChat({ messages: [], profile: p, report: rep, context: ctx })
           const saved = await saveMessage(conversationId, userId, 'assistant', reply)
           if (!active) return
           setMessages([saved])
@@ -74,6 +78,7 @@ export default function CoachChatScreen({ navigation, route }) {
         messages: history.map(m => ({ role: m.role, content: m.content })),
         profile,
         report,
+        context: sessionContext,
       })
       const savedCoach = await saveMessage(conversationId, userId, 'assistant', reply)
       setMessages(prev => [...prev.filter(m => m.id !== optimistic.id), savedUser, savedCoach])

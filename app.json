@@ -25,11 +25,11 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-secure-store"
-    ],
     "experiments": {
       "baseUrl": "/life-compass"
-    }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }
